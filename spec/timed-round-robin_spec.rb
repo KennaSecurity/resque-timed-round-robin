@@ -44,8 +44,20 @@ describe "TimedRoundRobin" do
     end
   end
 
+  describe '#queue_depth_for' do
+    it 'defaults to 0 if the DEFAULT_QUEUE_DEPTHS is empty' do
+      worker = Resque::Worker.new(:q1, :q2)
+      expect(worker.queue_depth_for(:q1)).to eq(0)
+    end
+
+    it 'uses the value stored in the DEFAULT_QUEUE_DEPTHS hash if present' do
+      Resque::Plugins::TimedRoundRobin::DEFAULT_QUEUE_DEPTHS = { :q1 => 2 }
+      worker = Resque::Worker.new(:q1, :q2)
+      expect(worker.queue_depth_for(:q1)).to eq(2)
+    end
+  end
+
   it "should pass lint" do
     Resque::Plugin.lint(Resque::Plugins::TimedRoundRobin)
   end
-
 end

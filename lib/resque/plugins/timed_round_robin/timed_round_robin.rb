@@ -41,10 +41,9 @@ module Resque::Plugins
       busy_queues.select {|q| q == queuename }.size
     end
 
-    DEFAULT_QUEUE_DEPTH = 0
     def should_work_on_queue?(queuename)
       return true if @queues.include? '*'  # workers with QUEUES=* are special and are not subject to queue depth setting
-      max = DEFAULT_QUEUE_DEPTH
+      max = queue_depth_for(queuename)
       unless ENV["RESQUE_QUEUE_DEPTH"].nil? || ENV["RESQUE_QUEUE_DEPTH"] == ""
         max = ENV["RESQUE_QUEUE_DEPTH"].to_i
       end
@@ -53,6 +52,13 @@ module Resque::Plugins
       log! "queue #{queuename} depth = #{cur_depth} max = #{max}"
       return true if cur_depth < max
       false
+    end
+
+    DEFAULT_QUEUE_DEPTH = 0
+    DEFAULT_QUEUE_DEPTHS = {}
+    def queue_depth_for(queuename)
+      depth = DEFAULT_QUEUE_DEPTHS.fetch(queuename, nil)
+      depth ||= DEFAULT_QUEUE_DEPTH
     end
 
     def reserve_with_round_robin
