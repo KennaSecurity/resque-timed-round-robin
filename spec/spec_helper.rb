@@ -1,4 +1,5 @@
 require 'pathname'
+require 'pry'
 require 'rspec'
 require 'resque-timed-round-robin'
 require 'timecop'
