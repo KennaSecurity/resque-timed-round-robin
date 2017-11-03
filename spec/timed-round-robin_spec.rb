@@ -45,7 +45,7 @@ describe "TimedRoundRobin" do
   end
 
   describe '#queue_depth_for' do
-    it 'defaults to 0 if the DEFAULT_QUEUE_DEPTHS is empty' do
+    it 'defaults to 0 if the DEFAULT_QUEUE_DEPTHS is not defined' do
       worker = Resque::Worker.new(:q1, :q2)
       expect(worker.queue_depth_for(:q1)).to eq(0)
     end
