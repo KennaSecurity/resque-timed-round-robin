@@ -55,9 +55,11 @@ module Resque::Plugins
     end
 
     DEFAULT_QUEUE_DEPTH = 0
-    DEFAULT_QUEUE_DEPTHS ||= {}
+
     def queue_depth_for(queuename)
-      (DEFAULT_QUEUE_DEPTHS).fetch(queuename, DEFAULT_QUEUE_DEPTH)
+      queue_depths = Resque::Plugins::TimedRoundRobin.configuration.queue_depths
+
+      queue_depths.fetch(queuename, DEFAULT_QUEUE_DEPTH)
     end
 
     def reserve_with_round_robin
@@ -97,28 +99,18 @@ module Resque::Plugins
       @queue != queue
     end
 
-    class Configuration
-      attr_accessor :default_queue_depths
-
-      def initialize
-        @default_queue_depths = {}
-      end
-    end
-
     def self.included(receiver)
       receiver.class_eval do
         alias reserve_without_round_robin reserve
         alias reserve reserve_with_round_robin
+      end
+    end
 
-        attr_accessor :configuration
+    class Configuration
+      attr_accessor :queue_depths
 
-        def self.configuration
-          @configuration ||= Configuration.new
-        end
-
-        def self.configure
-          yield(configuration)
-        end
+      def initialize
+        @queue_depths = {}
       end
     end
 
