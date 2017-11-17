@@ -38,7 +38,7 @@ module Resque::Plugins
     def queue_depth(queuename)
       busy_queues = Resque::Worker.working.map { |worker| worker.job["queue"] }.compact
       # find the queuename, count it.
-      busy_queues.select {|q| q == queuename }.size
+      busy_queues.select {|q| q.to_s == queuename.to_s }.size
     end
 
     def should_work_on_queue?(queuename)
@@ -55,6 +55,7 @@ module Resque::Plugins
     end
 
     DEFAULT_QUEUE_DEPTH = 0
+
     def queue_depth_for(queuename)
       queue_depths = Resque::Plugins::TimedRoundRobin.configuration.queue_depths
 

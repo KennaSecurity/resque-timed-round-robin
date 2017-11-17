@@ -18,7 +18,14 @@ module Resque
   class DataStore
     def working_keys(worker_ids)
       redis_keys = worker_ids.map { |id| "worker:#{id}" }
-      redis_keys.select { |k| @redis.exists(k) }
+
+      # pipeline our exists checks since there is no MEXISTS commmand.
+      # more efficient as we don't need a round trip between each query.
+      key_exists = @redis.pipelined { redis_keys.each { |k| @redis.exists(k) } }
+
+      # this returns a [true, false, true] type array.
+      # filter our original list for values where true was returned.
+      redis_keys.zip(key_exists).map { |key, exists| key if exists }.compact
     end
   end
 end

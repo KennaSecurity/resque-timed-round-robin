@@ -44,6 +44,37 @@ describe "TimedRoundRobin" do
     end
   end
 
+  describe '#queue_depth' do
+    let(:worker) { Resque::Worker.new(:q1, :q2) }
+    let(:worker2) { Resque::Worker.new(:q2, :q3) }
+
+    it 'returns 0 queue depth when no jobs are running' do
+      worker.register_worker
+      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(worker.queue_depth(:q1)).to eq(0)
+      expect(worker.queue_depth(:q2)).to eq(0)
+
+      worker2.register_worker
+      expect(Resque::Worker.exists?(worker2)).to eq(true)
+      expect(worker2.queue_depth(:q2)).to eq(0)
+      expect(worker2.queue_depth(:q3)).to eq(0)
+    end
+
+    it 'returns > 0 queue depth when jobs are running' do
+      j1 = Resque::Job.new(:q2, SomeJob)
+      j2 = Resque::Job.new(:q2, SomeJob)
+
+      worker.register_worker
+      worker.working_on(j1)
+      worker2.register_worker
+      worker2.working_on(j2)
+
+      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(worker.queue_depth(:q2)).to eq(2)
+      expect(worker2.queue_depth(:q2)).to eq(2)
+    end
+  end
+
   describe '#queue_depth_for' do
     let(:worker) { Resque::Worker.new(:q1, :q2) }
 
