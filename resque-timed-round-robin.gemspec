@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "resque", "~> 1.25"
 
-  gem.add_development_dependency('rspec', '~> 2.5')
+  gem.add_development_dependency('rspec', '~> 3.8')
   gem.add_development_dependency('rack-test', '~> 0.5.4')
   gem.add_development_dependency('timecop')
 
