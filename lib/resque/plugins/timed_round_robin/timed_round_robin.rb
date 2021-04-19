@@ -19,7 +19,13 @@ module Resque::Plugins
       return @rtrr_queues unless @rtrr_queues&.empty? || queue_list_expired?
       # refresh queues at a given interval, default is 60 seconds
       @queue_list_expiration = Time.now + queue_refresh_interval
-      queues
+      (queues || []) - paused_queues
+    end
+
+    def paused_queues
+      return [] if Resque::Plugins::TimedRoundRobin.configuration.paused_queues_set.nil?
+
+      data_store.smembers(Resque::Plugins::TimedRoundRobin.configuration.paused_queues_set)
     end
 
     def queue_list_expired?

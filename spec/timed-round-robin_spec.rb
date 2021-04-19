@@ -99,6 +99,28 @@ describe "TimedRoundRobin" do
           end
         end
       end
+
+      context "when a queue has been paused" do
+        let(:paused_queue_set) { "custom_paused_queues" }
+
+        before do
+          Resque::Plugins::TimedRoundRobin.configure do |c|
+            c.paused_queues_set = paused_queue_set
+            c.queue_refresh_interval = 0
+          end
+
+          Resque.data_store.sadd(paused_queue_set, "q1")
+        end
+
+        it "excludes the paused queues" do
+          worker = Resque::Worker.new(:q1, :q2)
+
+          expect(worker).to receive(:queues).exactly(2).times { ["q2", "q2"] }
+
+          worker.process
+          worker.process
+        end
+      end
     end
   end
 
