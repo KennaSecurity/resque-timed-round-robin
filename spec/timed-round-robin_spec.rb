@@ -3,7 +3,7 @@ require "spec_helper"
 describe "TimedRoundRobin" do
 
   before(:each) do
-    Resque.redis.flushall
+    Resque.redis.clear
   end
 
   context "a worker" do
