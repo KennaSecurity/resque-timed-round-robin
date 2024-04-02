@@ -130,12 +130,12 @@ describe "TimedRoundRobin" do
 
     it 'returns 0 queue depth when no jobs are running' do
       worker.register_worker
-      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(Resque::Worker.exists?(worker.id)).to eq(true)
       expect(worker.queue_depth(:q1)).to eq(0)
       expect(worker.queue_depth(:q2)).to eq(0)
 
       worker2.register_worker
-      expect(Resque::Worker.exists?(worker2)).to eq(true)
+      expect(Resque::Worker.exists?(worker2.id)).to eq(true)
       expect(worker2.queue_depth(:q2)).to eq(0)
       expect(worker2.queue_depth(:q3)).to eq(0)
     end
@@ -149,7 +149,7 @@ describe "TimedRoundRobin" do
       worker2.register_worker
       worker2.working_on(j2)
 
-      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(Resque::Worker.exists?(worker.id)).to eq(true)
       expect(worker.queue_depth(:q2)).to eq(2)
       expect(worker2.queue_depth(:q2)).to eq(2)
     end
@@ -167,7 +167,7 @@ describe "TimedRoundRobin" do
       worker2.register_worker
       worker2.working_on(j2)
 
-      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(Resque::Worker.exists?(worker.id)).to eq(true)
       expect(worker.queue_depth(:q2_foo)).to eq(2)
       expect(worker2.queue_depth(:q2_bar)).to eq(2)
     end
