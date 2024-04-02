@@ -17,3 +17,4 @@ test/version_tmp
 tmp
 /spec/dump.rdb
 /spec/redis-server.log
+redis.pid
