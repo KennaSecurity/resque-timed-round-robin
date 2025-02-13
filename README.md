@@ -3,7 +3,7 @@ Resque-timed-round-robin
 
 A plugin for Resque that implements round-robin behavior for workers.
 
-Resque 2.6.0 is the only requirement.
+Resque 2.7 is the only requirement.
 
 The standard behavior for Resque workers is to pull a job off a queue,
 and continue until the queue is empty.  Once empty, the worker moves

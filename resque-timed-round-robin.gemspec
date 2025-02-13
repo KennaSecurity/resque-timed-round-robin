@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{A Resque plugin to modify the worker behavior to pull jobs off queues, working a queue for a specified amount of time before rotating}
   gem.homepage      = ""
 
-  gem.add_dependency "resque", "~> 2.6.0"
+  gem.add_dependency "resque", "~> 2.7.0"
 
   gem.add_development_dependency('rspec', '~> 3.13')
   gem.add_development_dependency('rack-test', '~> 0.5.7')
