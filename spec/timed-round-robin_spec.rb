@@ -3,7 +3,7 @@ require "spec_helper"
 describe "TimedRoundRobin" do
 
   before(:each) do
-    Resque.redis.flushall
+    Resque.redis.clear
   end
 
   context "a worker" do
@@ -14,33 +14,33 @@ describe "TimedRoundRobin" do
       worker = Resque::Worker.new(:q1, :q2)
 
       worker.process
-      expect(Resque.size(:q1)).to eq 5
-      expect(Resque.size(:q2)).to eq 4
+      expect(Resque.size(:q1)).to eq 4
+      expect(Resque.size(:q2)).to eq 5
 
       worker.process
-      expect(Resque.size(:q1)).to eq 5
-      expect(Resque.size(:q2)).to eq 3
+      expect(Resque.size(:q1)).to eq 3
+      expect(Resque.size(:q2)).to eq 5
 
       Timecop.travel(Time.now + 60) do
         worker.process
-        expect(Resque.size(:q1)).to eq 4
-        expect(Resque.size(:q2)).to eq 3
+        expect(Resque.size(:q1)).to eq 3
+        expect(Resque.size(:q2)).to eq 4
       end
     end
 
     it "switches from an empty queue before a slice expires" do
-      5.times { Resque::Job.create(:q1, SomeJob) }
-      1.times { Resque::Job.create(:q2, SomeJob) }
+      1.times { Resque::Job.create(:q1, SomeJob) }
+      5.times { Resque::Job.create(:q2, SomeJob) }
 
       worker = Resque::Worker.new(:q1, :q2)
 
       worker.process
-      expect(Resque.size(:q1)).to eq 5
-      expect(Resque.size(:q2)).to eq 0
+      expect(Resque.size(:q1)).to eq 0
+      expect(Resque.size(:q2)).to eq 5
 
       worker.process
-      expect(Resque.size(:q1)).to eq 4
-      expect(Resque.size(:q2)).to eq 0
+      expect(Resque.size(:q1)).to eq 0
+      expect(Resque.size(:q2)).to eq 4
     end
 
     it "will check for new queues until it has some" do
@@ -130,12 +130,12 @@ describe "TimedRoundRobin" do
 
     it 'returns 0 queue depth when no jobs are running' do
       worker.register_worker
-      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(Resque::Worker.exists?(worker.id)).to eq(true)
       expect(worker.queue_depth(:q1)).to eq(0)
       expect(worker.queue_depth(:q2)).to eq(0)
 
       worker2.register_worker
-      expect(Resque::Worker.exists?(worker2)).to eq(true)
+      expect(Resque::Worker.exists?(worker2.id)).to eq(true)
       expect(worker2.queue_depth(:q2)).to eq(0)
       expect(worker2.queue_depth(:q3)).to eq(0)
     end
@@ -149,7 +149,7 @@ describe "TimedRoundRobin" do
       worker2.register_worker
       worker2.working_on(j2)
 
-      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(Resque::Worker.exists?(worker.id)).to eq(true)
       expect(worker.queue_depth(:q2)).to eq(2)
       expect(worker2.queue_depth(:q2)).to eq(2)
     end
@@ -167,7 +167,7 @@ describe "TimedRoundRobin" do
       worker2.register_worker
       worker2.working_on(j2)
 
-      expect(Resque::Worker.exists?(worker)).to eq(true)
+      expect(Resque::Worker.exists?(worker.id)).to eq(true)
       expect(worker.queue_depth(:q2_foo)).to eq(2)
       expect(worker2.queue_depth(:q2_bar)).to eq(2)
     end

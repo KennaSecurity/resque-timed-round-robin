@@ -16,7 +16,7 @@ module Resque::Plugins
     end
 
     def fetch_queues
-      return @rtrr_queues unless @rtrr_queues&.empty? || queue_list_expired?
+      return @rtrr_queues unless @rtrr_queues.nil? || @rtrr_queues.empty? || queue_list_expired?
       # refresh queues at a given interval, default is 60 seconds
       @queue_list_expiration = Time.now + queue_refresh_interval
       (queues || []) - paused_queues
@@ -43,8 +43,12 @@ module Resque::Plugins
     end
 
     def slice_expired?
-      @slice_expiration ||= Time.now
-      Time.now > @slice_expiration
+      if @slice_expiration
+        Time.now > @slice_expiration
+      else
+        @slice_expiration = Time.now
+        false
+      end
     end
 
     def queue_depth(queuename)
